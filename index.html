@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A modern, beautiful and mobile-friendly age calculator application.">
+    <title>Age Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        :root {
+            --bg-gradient-start: #e0f2f1;
+            --bg-gradient-end: #b2dfdb;
+            --primary-color: #00796b;
+            --secondary-color: #004d40;
+            --accent-color: #ffab40;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #212121;
+            --text-muted: #5f5f5f;
+            --shadow-color: rgba(0, 77, 64, 0.15);
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Space+Grotesk', sans-serif;
+            --birthday-color: #e91e63;
+            --danger-color: #d32f2f;
+            --generation-color: #7e57c2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-color);
+            transition: background-color 0.3s;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            animation: pageFadeIn 0.6s ease-out;
+        }
+
+        .page.hidden {
+            display: none;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Header / Navbar --- */
+        .app-header {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .logo h1 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .header-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            font-family: var(--font-main);
+        }
+
+        .header-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--shadow-color);
+        }
+
+        /* --- Calculator Page --- */
+        #calculatorPage .content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calculator-container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-family: var(--font-main);
+            letter-spacing: -0.3px;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: var(--font-main);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2);
+        }
+
+        .calc-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-main);
+            letter-spacing: -0.3px;
+        }
+
+        .calc-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .recalc-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-main);
+            letter-spacing: -0.3px;
+            display: none;
+        }
+
+        .recalc-btn:hover {
+            background: #ff8f00;
+            transform: translateY(-2px);
+        }
+
+        .result-area {
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-area h3 {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-family: var(--font-main);
+            font-weight: 500;
+            letter-spacing: -0.3px;
+        }
+
+        .result-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #dcedc8;
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .result-card p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-family: var(--font-heading);
+            letter-spacing: -0.5px;
+        }
+
+        .result-card span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: var(--font-main);
+            letter-spacing: -0.2px;
+        }
+
+        /* Additional Info Sections */
+        .info-section {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .info-section:hover {
+            transform: translateX(5px);
+        }
+
+        .info-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            width: 40px;
+            height: 40px;
+            background: #e0f2f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-family: var(--font-main);
+            letter-spacing: -0.2px;
+        }
+
+        .info-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            font-family: var(--font-main);
+            letter-spacing: -0.3px;
+        }
+
+        .generation-info {
+            background: #f5f5f5;
+            border-left: 4px solid var(--generation-color);
+        }
+
+        .generation-info .info-icon {
+            color: var(--generation-color);
+            background: #ede7f6;
+        }
+
+        .birthday-message {
+            background: #fce4ec;
+            color: var(--birthday-color);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: pulse 2s infinite;
+            font-family: var(--font-heading);
+        }
+
+        /* More Info Section */
+        .more-info-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .more-info-btn:hover {
+            background: #ff8f00;
+            transform: translateY(-2px);
+        }
+
+        .more-info-container {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .more-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .more-info-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .more-info-item-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .more-info-item-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .biological-facts {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ddd;
+        }
+
+        .biological-title {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-family: var(--font-heading);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        /* --- Footer --- */
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+            color: var(--text-muted);
+            font-family: var(--font-main);
+            letter-spacing: -0.2px;
+        }
+        
+        /* --- Validation --- */
+        .error {
+            color: #d32f2f;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+            font-family: var(--font-main);
+            letter-spacing: -0.2px;
+        }
+        input.invalid {
+            border-color: #d32f2f;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .logo h1 { font-size: 1.5rem; }
+            .header-btn { padding: 8px 15px; font-size: 0.9rem; }
+            .calculator-container { padding: 25px; }
+            .result-cards { grid-template-columns: 1fr 1fr; }
+            .more-info-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .logo h1 { font-size: 1.2rem; }
+            .logo i { font-size: 1.5rem; }
+            .header-btn span { display: none; }
+            .header-btn { padding: 10px; border-radius: 50%; }
+            .result-cards { grid-template-columns: 1fr; }
+            .history-item { flex-direction: column; align-items: flex-start; }
+            .history-item .age-result { text-align: left; margin-top: 5px; }
+        }
+        
+    </style>
+</head>
+<body>
+
+    <!-- Calculator Page -->
+    <div id="calculatorPage" class="page">
+        <header class="app-header">
+            <div class="logo">
+                <i class="far fa-calendar-alt"></i>
+                <h1>Age Calculator</h1>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="calculator-container">
+                <div class="input-group" id="dobInputGroup">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob">
+                    <div class="error" id="dobError">Please enter a valid date of birth.</div>
+                </div>
+                <button class="calc-btn" id="calcBtn" onclick="calculateAge()">
+                    <i class="fas fa-calculator"></i> Calculate Age
+                </button>
+                <button class="recalc-btn" id="recalcBtn" onclick="resetCalculator()">
+                    <i class="fas fa-redo"></i> Recalculate
+                </button>
+                    <div class="birthday-message" id="birthdayMessage">
+                        <i class="fas fa-birthday-cake"></i> Happy Birthday! <i class="fas fa-birthday-cake"></i>
+                    </div>
+
+                <div class="result-area" id="resultArea">
+                    <h3 id="resultName"></h3>
+                    <div class="result-cards">
+                        <div class="result-card">
+                            <p id="years">--</p>
+                            <span>Years</span>
+                        </div>
+                        <div class="result-card">
+                            <p id="months">--</p>
+                            <span>Months</span>
+                        </div>
+                        <div class="result-card">
+                            <p id="days">--</p>
+                            <span>Days</span>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info Sections -->
+                     <div class="info-section generation-info" id="generationSection" style="display: none;">
+                        <div class="info-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-title">Generation</div>
+                            <div class="info-value" id="generation"></div>
+                        </div>
+                    </div>
+                    <div class="info-section" id="ageInDaysSection" style="display: none;">
+                        <div class="info-icon">
+                            <i class="far fa-calendar-check"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-title">Total Days</div>
+                            <div class="info-value" id="ageInDays"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section" id="nextBirthdaySection" style="display: none;">
+                        <div class="info-icon">
+                            <i class="fas fa-birthday-cake"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-title">Next Birthday</div>
+                            <div class="info-value" id="nextBirthday"></div>
+                        </div>
+                    </div>
+
+
+                    <!-- More Info Section -->
+                    <button class="more-info-btn" id="moreInfoBtn" onclick="toggleMoreInfo()" style="display: none;">
+                        <i class="fas fa-info-circle"></i> More Interesting Facts
+                    </button>
+
+                    <div class="more-info-container" id="moreInfoContainer">
+                        <div class="more-info-grid">
+                            <div class="more-info-item">
+                                <div class="more-info-item-title">In Weeks</div>
+                                <div class="more-info-item-value" id="ageInWeeks">--</div>
+                            </div>
+                            <div class="more-info-item">
+                                <div class="more-info-item-title">In Hours</div>
+                                <div class="more-info-item-value" id="ageInHours">--</div>
+                            </div>
+                            <div class="more-info-item">
+                                <div class="more-info-item-title">In Minutes</div>
+                                <div class="more-info-item-value" id="ageInMinutes">--</div>
+                            </div>
+                            <div class="more-info-item">
+                                <div class="more-info-item-title">In Seconds</div>
+                                <div class="more-info-item-value" id="ageInSeconds">--</div>
+                            </div>
+                        </div>
+
+                        <div class="biological-facts">
+                            <div class="biological-title">Biological Facts</div>
+                            <div class="more-info-grid">
+                                <div class="more-info-item">
+                                    <div class="more-info-item-title">Heart Beats</div>
+                                    <div class="more-info-item-value" id="heartBeats">--</div>
+                                </div>
+                                <div class="more-info-item">
+                                    <div class="more-info-item-title">Breaths Taken</div>
+                                    <div class="more-info-item-value" id="breaths">--</div>
+                                </div>
+                                <div class="more-info-item">
+                                    <div class="more-info-item-title">Sleeping Time</div>
+                                    <div class="more-info-item-value" id="sleepingTime">--</div>
+                                </div>
+                                <div class="more-info-item">
+                                    <div class="more-info-item-title">Hair Growth</div>
+                                    <div class="more-info-item-value" id="hairGrowth">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2025 | All Rights Reserved.</p>
+        </footer>
+    </div>
+
+<script>
+    // DOM Elements
+    const calculatorPage = document.getElementById('calculatorPage');
+    const moreInfoBtn = document.getElementById('moreInfoBtn');
+    const moreInfoContainer = document.getElementById('moreInfoContainer');
+    const dobInputGroup = document.getElementById('dobInputGroup');
+    const calcBtn = document.getElementById('calcBtn');
+    const recalcBtn = document.getElementById('recalcBtn');
+    const resultArea = document.getElementById('resultArea');
+
+    // Tone.js Birthday Sound Only
+    const birthdaySound = new Tone.PolySynth(Tone.Synth).toDestination();
+    birthdaySound.volume.value = -5;
+
+    // App State
+    let moreInfoVisible = false;
+
+    // Page Navigation
+    function showPage(pageToShow) {
+        calculatorPage.classList.add('hidden');
+        pageToShow.classList.remove('hidden');
+    }
+
+    // Birthday Sound Function
+    function playBirthdaySound() {
+        const now = Tone.now();
+        birthdaySound.triggerAttackRelease("C5", "8n", now);
+        birthdaySound.triggerAttackRelease("C5", "8n", now + 0.2);
+        birthdaySound.triggerAttackRelease("D5", "4n", now + 0.4);
+        birthdaySound.triggerAttackRelease("C5", "4n", now + 0.8);
+        birthdaySound.triggerAttackRelease("F5", "4n", now + 1.2);
+        birthdaySound.triggerAttackRelease("E5", "2n", now + 1.6);
+    }
+
+    // Toggle More Info Section
+    function toggleMoreInfo() {
+        moreInfoVisible = !moreInfoVisible;
+        if (moreInfoVisible) {
+            moreInfoContainer.style.display = 'block';
+            moreInfoBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
+        } else {
+            moreInfoContainer.style.display = 'none';
+            moreInfoBtn.innerHTML = '<i class="fas fa-info-circle"></i> More Interesting Facts';
+        }
+    }
+
+    // Reset calculator to initial state
+    function resetCalculator() {
+        dobInputGroup.style.display = 'block';
+        calcBtn.style.display = 'block';
+        recalcBtn.style.display = 'none';
+        resultArea.style.display = 'none';
+        moreInfoBtn.style.display = 'none';
+        moreInfoContainer.style.display = 'none';
+        document.getElementById('dob').value = '';
+        document.getElementById('dobError').style.display = 'none';
+        document.getElementById('dob').classList.remove('invalid');
+        document.getElementById('birthdayMessage').style.display = 'none';
+    }
+
+    // Age Calculation Logic
+    function calculateAge() {
+        const dobInput = document.getElementById('dob');
+        const dobString = dobInput.value;
+
+        if (!validateInputs(dobString)) return;
+
+        const dob = new Date(dobString);
+        const today = new Date();
+
+        let years = today.getFullYear() - dob.getFullYear();
+        let months = today.getMonth() - dob.getMonth();
+        let days = today.getDate() - dob.getDate();
+
+        if (days < 0) {
+            months--;
+            days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+        }
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+
+        // Display results
+        document.getElementById('resultName').textContent = `Your age is`;
+        document.getElementById('years').textContent = years;
+        document.getElementById('months').textContent = months;
+        document.getElementById('days').textContent = days;
+        document.getElementById('resultArea').style.display = 'block';
+        moreInfoBtn.style.display = 'flex';
+
+        // Hide input and show recalculate button
+        dobInputGroup.style.display = 'none';
+        calcBtn.style.display = 'none';
+        recalcBtn.style.display = 'block';
+
+        // Calculate and show additional info
+        calculateNextBirthday(dob);
+        calculateAgeInDays(dob, today);
+        checkBirthday(dob, today);
+        determineGeneration(dob.getFullYear());
+        calculateDetailedTime(dob, today);
+        calculateBiologicalFacts(dob, today);
+    }
+
+    function validateInputs(dobString) {
+        let isValid = true;
+        const dobError = document.getElementById('dobError');
+        const dobInput = document.getElementById('dob');
+        
+        if (!dobString) {
+            dobError.textContent = 'Please enter a valid date of birth.';
+            dobError.style.display = 'block';
+            dobInput.classList.add('invalid');
+            isValid = false;
+        } else {
+            const dob = new Date(dobString);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if (dob > today) {
+                dobError.textContent = 'Date of birth cannot be in the future.';
+                dobError.style.display = 'block';
+                dobInput.classList.add('invalid');
+                isValid = false;
+            } else {
+                dobError.style.display = 'none';
+                dobInput.classList.remove('invalid');
+            }
+        }
+        return isValid;
+    }
+
+    // Additional Calculations
+    function calculateNextBirthday(dob) {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        
+        // Get next birthday
+        let nextBirthday = new Date(currentYear, dob.getMonth(), dob.getDate());
+        
+        // If birthday already passed this year, set for next year
+        if (nextBirthday < today) {
+            nextBirthday = new Date(currentYear + 1, dob.getMonth(), dob.getDate());
+        }
+        
+        // Calculate difference in days
+        const diffTime = nextBirthday - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Format the date
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        const formattedDate = nextBirthday.toLocaleDateString('en-US', options);
+        
+        // Display result
+        document.getElementById('nextBirthday').textContent = `${formattedDate} (${diffDays} days left)`;
+        document.getElementById('nextBirthdaySection').style.display = 'flex';
+    }
+
+    function calculateAgeInDays(dob, today) {
+        // Set both dates to midnight to get accurate day count
+        const dobMidnight = new Date(dob.getFullYear(), dob.getMonth(), dob.getDate());
+        const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        
+        const diffTime = todayMidnight - dobMidnight;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        document.getElementById('ageInDays').textContent = `${diffDays.toLocaleString()} days`;
+        document.getElementById('ageInDaysSection').style.display = 'flex';
+        return diffDays;
+    }
+
+    function calculateDetailedTime(dob, today) {
+        const diffTime = today - dob;
+        const diffDays = calculateAgeInDays(dob, today);
+        const diffWeeks = Math.floor(diffDays / 7);
+        const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+        const diffMinutes = Math.floor(diffTime / (1000 * 60));
+        const diffSeconds = Math.floor(diffTime / 1000);
+
+        document.getElementById('ageInWeeks').textContent = `${diffWeeks.toLocaleString()} weeks`;
+        document.getElementById('ageInHours').textContent = `${diffHours.toLocaleString()} hours`;
+        document.getElementById('ageInMinutes').textContent = `${diffMinutes.toLocaleString()} minutes`;
+        document.getElementById('ageInSeconds').textContent = `${diffSeconds.toLocaleString()} seconds`;
+    }
+
+    function calculateBiologicalFacts(dob, today) {
+        const diffTime = today - dob;
+        const diffDays = calculateAgeInDays(dob, today);
+        const diffHours = diffTime / (1000 * 60 * 60);
+        
+        // Average heart rate: 72 beats per minute
+        const heartBeats = Math.floor(72 * 60 * diffHours);
+        
+        // Average breathing rate: 16 breaths per minute
+        const breaths = Math.floor(16 * 60 * diffHours);
+        
+        // Average sleep: 7 hours per day
+        const sleepingHours = Math.floor(7 * diffDays);
+        const sleepingYears = Math.floor(sleepingHours / 24 / 365);
+        const sleepingDays = Math.floor((sleepingHours % (24 * 365)) / 24);
+        
+        // Average hair growth: 0.44 mm per day (about 0.5 inches per month)
+        const totalDays = diffDays;
+        const hairGrowthMM = (0.44 * totalDays).toFixed(1);
+        const hairGrowthInches = (hairGrowthMM / 25.4).toFixed(1);
+        
+        // Blinking: 15-20 times per minute (using 17.5 as average)
+        const blinks = Math.floor(17.5 * 60 * diffHours);
+        
+        document.getElementById('heartBeats').textContent = `${heartBeats.toLocaleString()} beats`;
+        document.getElementById('breaths').textContent = `${breaths.toLocaleString()} breaths`;
+        document.getElementById('sleepingTime').textContent = `${sleepingYears} years, ${sleepingDays} days`;
+        document.getElementById('hairGrowth').textContent = `${hairGrowthInches} inches (${hairGrowthMM} mm)`;
+    }
+
+    function checkBirthday(dob, today) {
+        const isBirthday = dob.getDate() === today.getDate() && 
+                          dob.getMonth() === today.getMonth();
+        
+        if (isBirthday) {
+            document.getElementById('birthdayMessage').style.display = 'block';
+            document.getElementById('birthdayMessage').textContent = 
+                `🎉 Happy Birthday! 🎉`;
+            playBirthdaySound();
+        } else {
+            document.getElementById('birthdayMessage').style.display = 'none';
+        }
+    }
+
+    function determineGeneration(birthYear) {
+        let generation = '';
+        
+        if (birthYear >= 2013) generation = "Generation Alpha";
+        else if (birthYear >= 1997) generation = "Generation Z";
+        else if (birthYear >= 1981) generation = "Millennials";
+        else if (birthYear >= 1965) generation = "Generation X";
+        else if (birthYear >= 1946) generation = "Baby Boomers";
+        else if (birthYear >= 1928) generation = "Silent Generation";
+        else generation = "Greatest Generation";
+        
+        document.getElementById('generation').textContent = generation;
+        document.getElementById('generationSection').style.display = 'flex';
+    }
+</script>
+</body>
+</html>
